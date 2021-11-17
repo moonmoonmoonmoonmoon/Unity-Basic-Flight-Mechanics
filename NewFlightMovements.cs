@@ -29,31 +29,46 @@ public class NewFlightMovements : MonoBehaviour
 
     }
 
-    private void manuvers(float max)
+    private void manuvers(float max) // combined torque controls
     {
-        if (Input.GetKey(KeyCode.E))
-        {
-            rb.AddTorque(transform.forward * -max/2, ForceMode.VelocityChange);
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
-            rb.AddTorque(transform.forward * max/2, ForceMode.VelocityChange);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            rb.AddTorque(transform.up * -max/2, ForceMode.VelocityChange);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            rb.AddTorque(transform.up * max/2, ForceMode.VelocityChange);
-        }
+        pitch(max);
+        yaw(max);
+        roll(max);
+    }
+
+    private void pitch(float max) // lateral axis control
+    {
         if (Input.GetKey(KeyCode.S))
         {
-            rb.AddTorque(transform.right * -max/2, ForceMode.VelocityChange);
+            rb.AddTorque(transform.right * -max / 2, ForceMode.VelocityChange);
         }
         if (Input.GetKey(KeyCode.W))
         {
-            rb.AddTorque(transform.right * max/2, ForceMode.VelocityChange);
+            rb.AddTorque(transform.right * max / 2, ForceMode.VelocityChange);
+        }
+    }
+
+    private void yaw(float max) // perpendicular axis control
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            rb.AddTorque(transform.up * -max / 8, ForceMode.VelocityChange);
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            rb.AddTorque(transform.up * max / 8, ForceMode.VelocityChange);
+        }
+    }
+
+    private void roll(float max) // longitudinal axis control
+    {
+        if (Input.GetKey(KeyCode.E))
+        {
+            rb.AddTorque(transform.forward * -max / 2, ForceMode.VelocityChange);
+        }
+        if (Input.GetKey(KeyCode.Q))
+        {
+            rb.AddTorque(transform.forward * max / 2, ForceMode.VelocityChange);
         }
     }
 
