@@ -12,7 +12,7 @@ Second - Initial Setup of 3D Model
 2) Optional to add a collider to the 3D model.
 3) Drag and drop the Flight Mechanics .cs file to the 3D model.
 
-#Notes:
+# Notes:
 - Make sure that the project has default input settings
 - If in any case that the mouse inputs are not working, it is because the Input Manager is not in the default settings.
 - To reset, click 'Edit' -> 'Project Settings' -> 'Input Manager'. Then click on the cog-icon on the top left of the window and click 'Reset'.
