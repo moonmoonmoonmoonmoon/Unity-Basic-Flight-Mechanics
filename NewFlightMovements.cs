@@ -38,11 +38,11 @@ public class NewFlightMovements : MonoBehaviour
 
     private void pitch(float max) // lateral axis control
     {
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S) || Input.GetAxis("Mouse Y") > 0)
         {
             rb.AddTorque(transform.right * -max / 2, ForceMode.VelocityChange);
         }
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W) || Input.GetAxis("Mouse Y") < 0)
         {
             rb.AddTorque(transform.right * max / 2, ForceMode.VelocityChange);
         }
@@ -50,23 +50,23 @@ public class NewFlightMovements : MonoBehaviour
 
     private void yaw(float max) // perpendicular axis control
     {
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A) || Input.GetAxis("Mouse X") < 0)
         {
-            rb.AddTorque(transform.up * -max / 8, ForceMode.VelocityChange);
+            rb.AddTorque(transform.up * -max / 2, ForceMode.VelocityChange);
         }
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D) || Input.GetAxis("Mouse X") > 0)
         {
-            rb.AddTorque(transform.up * max / 8, ForceMode.VelocityChange);
+            rb.AddTorque(transform.up * max / 2, ForceMode.VelocityChange);
         }
     }
 
     private void roll(float max) // longitudinal axis control
     {
-        if (Input.GetKey(KeyCode.E))
+        if (Input.GetKey(KeyCode.E) || Input.GetAxis("Mouse X") > 0)
         {
             rb.AddTorque(transform.forward * -max / 2, ForceMode.VelocityChange);
         }
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q) || Input.GetAxis("Mouse X") < 0)
         {
             rb.AddTorque(transform.forward * max / 2, ForceMode.VelocityChange);
         }
