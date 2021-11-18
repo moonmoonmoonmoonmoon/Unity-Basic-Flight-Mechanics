@@ -5,8 +5,8 @@ using UnityEngine;
 public class NewFlightMovements : MonoBehaviour
 {
     private Rigidbody rb;
-    private float speed = 10;
-    private float dragMax = 10, manuverMax = 5, manuverVal = 0.5f;
+    private float speed = 1, weight = 5000;
+    private float dragMax = 0.5f, manuverMax = 5, manuverVal = 0.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -14,6 +14,8 @@ public class NewFlightMovements : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.drag = dragMax;
         rb.angularDrag = manuverMax;
+        rb.mass = weight;
+
 
     }
 
@@ -78,15 +80,23 @@ public class NewFlightMovements : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             rb.AddForce(transform.forward * maxSpeed, ForceMode.VelocityChange);
-            rb.AddForce(transform.up * 1 / 3, ForceMode.VelocityChange);
+            rb.AddForce(transform.up * 0.005f, ForceMode.VelocityChange);
 
+        }
+
+        // breaking
+        if (Input.GetKey(KeyCode.F))
+        {
+            rb.AddForce(transform.forward * 0.05f, ForceMode.VelocityChange);
+            rb.AddForce(transform.up * 0, ForceMode.VelocityChange);
         }
 
         // crusing speed
         else
         {
             rb.AddForce(transform.forward * maxSpeed * 1 / 2, ForceMode.VelocityChange);
-            rb.AddForce(transform.up * 1 / 3, ForceMode.VelocityChange);
+            rb.AddForce(transform.up * 1 / 5, ForceMode.VelocityChange);
         }
+
     }
 }
