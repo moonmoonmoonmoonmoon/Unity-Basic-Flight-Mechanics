@@ -5,7 +5,7 @@ using UnityEngine;
 public class NewFlightMovements : MonoBehaviour
 {
     private Rigidbody rb;
-    private float speed = 1, weight = 5000;
+    private float speed = 1, weight = 5000, lift = 0.2f;
     private float dragMax = 0.5f, manuverMax = 5, manuverVal = 0.5f;
 
     // Start is called before the first frame update
@@ -79,24 +79,38 @@ public class NewFlightMovements : MonoBehaviour
         // forward acceleration
         if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddForce(transform.forward * maxSpeed, ForceMode.VelocityChange);
-            rb.AddForce(transform.up * 0.005f, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * maxSpeed * 0.5f, ForceMode.VelocityChange);
+            rb.AddForce(transform.up * lift/200, ForceMode.VelocityChange);
 
         }
 
         // breaking
         if (Input.GetKey(KeyCode.F))
         {
-            rb.AddForce(transform.forward * 0.05f, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * 0.0015f, ForceMode.VelocityChange);
             rb.AddForce(transform.up * 0, ForceMode.VelocityChange);
         }
 
         // crusing speed
         else
         {
-            rb.AddForce(transform.forward * maxSpeed * 1 / 2, ForceMode.VelocityChange);
-            rb.AddForce(transform.up * 1 / 5, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * 0.25f, ForceMode.VelocityChange);
+            stall();
         }
 
+    }
+
+    private void stall()
+    {
+        // stall motion if speed is less than a value
+        // affects the lift of the aircraft at low speed
+        if (rb.velocity.magnitude < 18f)
+        {
+            rb.AddForce(transform.up * 0.005f);
+        }
+        else
+        {
+            rb.AddForce(transform.up * lift, ForceMode.VelocityChange);
+        }
     }
 }
