@@ -16,3 +16,6 @@ Second - Initial Setup of 3D Model
 - Make sure that the project has default input settings
 - If in any case that the mouse inputs are not working, it is because the Input Manager is not in the default settings.
 - To reset, click 'Edit' -> 'Project Settings' -> 'Input Manager'. Then click on the cog-icon on the top left of the window and click 'Reset'.
+
+# Changes:
+- January 30th, 2022: Added Base Class (Aircraft) and Derived Class (Airliner). This allows us to add new aircraft types using a inheritance.
