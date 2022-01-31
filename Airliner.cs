@@ -2,40 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewFlightMovements : MonoBehaviour
+public class Airliner : Aircraft
 {
     private Rigidbody rb;
     private float speed = 1, weight = 5000, lift = 0.2f;
     private float dragMax = 0.5f, manuverMax = 5, manuverVal = 0.5f;
-
-    // Start is called before the first frame update
-    void Start()
+    public override void Manuver() // combined torque controls
     {
-        rb = GetComponent<Rigidbody>();
-        rb.drag = dragMax;
-        rb.angularDrag = manuverMax;
-        rb.mass = weight;
-
-
-    }
-
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        // Need to optimize this code. Organize the code better...
-        // However, this is a working solution for a rigidbody.
-        // It mimics flight behvaiour, but it does not simulate flight acurately.
-
-        manuvers(manuverVal);
-        forwardSpeed(speed);    
-
-    }
-
-    private void manuvers(float max) // combined torque controls
-    {
-        pitch(max);
-        yaw(max);
-        roll(max);
+        pitch(manuverVal);
+        yaw(manuverVal);
+        roll(manuverVal);
     }
 
     private void pitch(float max) // lateral axis control
@@ -74,12 +50,12 @@ public class NewFlightMovements : MonoBehaviour
         }
     }
 
-    private void forwardSpeed(float maxSpeed)
+    public override void ForwardSpeed()
     {
         // forward acceleration
         if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddForce(transform.forward * maxSpeed * 0.5f, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * speed * 0.5f, ForceMode.VelocityChange);
             rb.AddForce(transform.up * lift/200, ForceMode.VelocityChange);
 
         }
@@ -95,12 +71,12 @@ public class NewFlightMovements : MonoBehaviour
         else
         {
             rb.AddForce(transform.forward * 0.25f, ForceMode.VelocityChange);
-            stall();
+            Stall();
         }
 
     }
 
-    private void stall()
+    public override void Stall()
     {
         // stall motion if speed is less than a value
         // affects the lift of the aircraft at low speed
@@ -112,5 +88,13 @@ public class NewFlightMovements : MonoBehaviour
         {
             rb.AddForce(transform.up * lift, ForceMode.VelocityChange);
         }
+    }
+
+    public override void SetValues()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.drag = dragMax;
+        rb.angularDrag = manuverMax;
+        rb.mass = weight;
     }
 }
