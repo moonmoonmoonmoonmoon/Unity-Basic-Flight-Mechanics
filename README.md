@@ -19,3 +19,4 @@ Second - Initial Setup of 3D Model
 
 # Changes:
 - January 30th, 2022: Added Base Class (Aircraft) and Derived Class (Airliner). This allows us to add new aircraft types using a inheritance.
+- February 1st, 2022: Stabalized the movements of a game object that is using the Airliner.cs script.
