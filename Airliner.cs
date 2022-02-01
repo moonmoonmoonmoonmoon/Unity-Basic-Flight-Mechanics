@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class Airliner : Aircraft
 {
+    // Will serialize these at a later time
+    // Controlling these values would be better on the UI
     private Rigidbody rb;
-    private float speed = 1, weight = 5000, lift = 0.2f;
-    private float dragMax = 0.5f, manuverMax = 5, manuverVal = 0.5f;
+    private float speed = 0.1f, weight = 5000, lift = 0.07f;
+    private float dragMax = 0.8f, manuverMax = 5, manuverVal = 0.1f;
     public override void Manuver() // combined torque controls
     {
-        pitch(manuverVal);
-        yaw(manuverVal);
-        roll(manuverVal);
+        // These are unique to an Airliner or Large Aircraft
+        Pitch(manuverVal);
+        Yaw(manuverVal);
+        Roll(manuverVal);
     }
 
-    private void pitch(float max) // lateral axis control
+    private void Pitch(float max) // lateral axis control
     {
         if (Input.GetKey(KeyCode.S) || Input.GetAxisRaw("Mouse Y") > 0)
         {
@@ -26,7 +29,7 @@ public class Airliner : Aircraft
         }
     }
 
-    private void yaw(float max) // perpendicular axis control
+    private void Yaw(float max) // perpendicular axis control
     {
         if (Input.GetKey(KeyCode.A))
         {
@@ -38,7 +41,7 @@ public class Airliner : Aircraft
         }
     }
 
-    private void roll(float max) // longitudinal axis control
+    private void Roll(float max) // longitudinal axis control
     {
         if (Input.GetKey(KeyCode.E) || Input.GetAxisRaw("Mouse X") > 0)
         {
@@ -92,6 +95,8 @@ public class Airliner : Aircraft
 
     public override void SetValues()
     {
+        // set the values to a game object
+        // For an Aircraft
         rb = GetComponent<Rigidbody>();
         rb.drag = dragMax;
         rb.angularDrag = manuverMax;
