@@ -70,26 +70,22 @@ public class Airliner : Aircraft
             rb.AddForce(transform.up * 0, ForceMode.VelocityChange);
         }
 
-        // crusing speed
+        // cruising speed
         else
         {
             rb.AddForce(transform.forward * 0.25f, ForceMode.VelocityChange);
-            Stall();
+            //Stall();
         }
 
     }
 
-    public override void Stall()
+    public void Stall()
     {
         // stall motion if speed is less than a value
         // affects the lift of the aircraft at low speed
         if (rb.velocity.magnitude < 18f)
         {
             rb.AddForce(transform.up * 0.005f);
-        }
-        else
-        {
-            rb.AddForce(transform.up * lift, ForceMode.VelocityChange);
         }
     }
 

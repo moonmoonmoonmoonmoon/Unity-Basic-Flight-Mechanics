@@ -27,10 +27,10 @@ public class Aircraft : MonoBehaviour
         Debug.Log("Base Class For Aircraft: ForwardSpeed()");
     } // forward speed
 
-    public virtual void Stall()
-    {
-        Debug.Log("Base Class For Aircraft: Stall()");
-    } // stall manuver
+    //public virtual void Stall()
+    //{
+    //    Debug.Log("Base Class For Aircraft: Stall()");
+    //} // stall manuver
 
     public virtual void SetValues()
     {
