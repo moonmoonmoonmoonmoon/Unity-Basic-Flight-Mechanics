@@ -25,6 +25,7 @@ public class Fighter : Aircraft
         cruisingLift = 13.0f,
         speed = 0.25f,
         cruisingSpeed = 200.0f;
+
     public override void Manuver() // combined torque controls
     {
         // These are unique to a derived aircraft class
@@ -122,9 +123,13 @@ public class Fighter : Aircraft
             
         }
 
-        // debugging an issue with z-axis angle for Stall()
+        // debugging an issue with certain axis angle for Stall()
         //Debug.Log(transform.eulerAngles.z);
-
+        //Debug.Log("Euler Angle: " + rb.transform.eulerAngles.x + "\nQ-Angle: " + rb.transform.rotation.x);
+        //float x = rb.transform.eulerAngles.x;
+        //float w = rb.transform.rotation.w;
+        //float eq = QuaternionToEuler();
+        
     }
 
     public void Stall()
@@ -134,15 +139,21 @@ public class Fighter : Aircraft
         // affects the pitch angle of the aircraft
         if (rb.velocity.magnitude < 30.0f)
         {
-            // will need to optimize this in the future
-            // this changes the pitch angle when stalling
-            if ((transform.eulerAngles.z <= 75.0f && transform.eulerAngles.z >= 0.0f) || 
-                !(transform.eulerAngles.z <= 315.0f && transform.eulerAngles.z >= 150.0f ) &&
-                !(transform.eulerAngles.z >= 30.0f && transform.eulerAngles.z <= 150.0f)) 
-            {
-                rb.AddTorque(transform.right * manuverVal / 30, ForceMode.VelocityChange);
-            }
-
+            //// will need to optimize this in the future
+            //// this changes the pitch angle when stalling
+            //if ((transform.eulerAngles.z <= 75.0f && transform.eulerAngles.z >= 0.0f) ||
+            //    !(transform.eulerAngles.z <= 315.0f && transform.eulerAngles.z >= 150.0f) &&
+            //    !(transform.eulerAngles.z >= 30.0f && transform.eulerAngles.z <= 150.0f) ||
+            //    (transform.eulerAngles.x <= 360.0f && transform.eulerAngles.x >= 270.0f))
+            //{
+            //    rb.AddTorque(transform.right * manuverVal / 30, ForceMode.VelocityChange);
+            //}
+            //if (transform.eulerAngles.x >= 270.0f && transform.eulerAngles.x <= 240.0f)
+            //{
+            //    rb.AddTorque(transform.right * -manuverVal / 30, ForceMode.VelocityChange);
+            //    Debug.Log("Nose Is Up");
+            //}
+            
             // decrease lift when aircraft velocity is below a certain value
             rb.AddForce(transform.up * -1 / 50, ForceMode.VelocityChange);
             Debug.Log("WARNING: STALL!!!");
@@ -159,4 +170,21 @@ public class Fighter : Aircraft
         rb.angularDrag = manuverMax;
         rb.mass = weight;
     }
+
+    ///
+    /// Had to create a CopySign method because Mathf does not seem to have one...
+    /// 
+    public float CopySign(float m, float n)
+    {
+        if (!(n < 0))
+        {
+            return Mathf.Abs(m);
+        }
+
+        else
+        {
+            return -m;
+        }
+    } // end of CopySign
+
 }
