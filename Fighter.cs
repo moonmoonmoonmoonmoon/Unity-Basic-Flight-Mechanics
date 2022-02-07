@@ -9,12 +9,13 @@ public class Fighter : Aircraft
     private Rigidbody rb;
     private float lift = 1.0f;
     private float manuverMax = 5, manuverVal = 0.1f;
+    public Quaternion desiredDir;
 
-    // serialized fields:
+    // serialized fields: --> turns out, just needed to make it public...
     // - need to optimize these in the future
     // - manipulating these values on the editor may be confusing
     // - however, manipulating these are easier now than before
-    [SerializeField] private float 
+    public float 
         pitchStrength = 3.0f, 
         yawStrength = 8.0f, 
         rollStrength = 1.0f,
@@ -123,12 +124,6 @@ public class Fighter : Aircraft
             
         }
 
-        // debugging an issue with certain axis angle for Stall()
-        //Debug.Log(transform.eulerAngles.z);
-        //Debug.Log("Euler Angle: " + rb.transform.eulerAngles.x + "\nQ-Angle: " + rb.transform.rotation.x);
-        //float x = rb.transform.eulerAngles.x;
-        //float w = rb.transform.rotation.w;
-        //float eq = QuaternionToEuler();
         
     }
 
@@ -139,24 +134,18 @@ public class Fighter : Aircraft
         // affects the pitch angle of the aircraft
         if (rb.velocity.magnitude < 30.0f)
         {
-            //// will need to optimize this in the future
-            //// this changes the pitch angle when stalling
-            //if ((transform.eulerAngles.z <= 75.0f && transform.eulerAngles.z >= 0.0f) ||
-            //    !(transform.eulerAngles.z <= 315.0f && transform.eulerAngles.z >= 150.0f) &&
-            //    !(transform.eulerAngles.z >= 30.0f && transform.eulerAngles.z <= 150.0f) ||
-            //    (transform.eulerAngles.x <= 360.0f && transform.eulerAngles.x >= 270.0f))
-            //{
-            //    rb.AddTorque(transform.right * manuverVal / 30, ForceMode.VelocityChange);
-            //}
-            //if (transform.eulerAngles.x >= 270.0f && transform.eulerAngles.x <= 240.0f)
-            //{
-            //    rb.AddTorque(transform.right * -manuverVal / 30, ForceMode.VelocityChange);
-            //    Debug.Log("Nose Is Up");
-            //}
-            
+
+            // change the nose direction to point to the ground when stalling
+            // now utilizing Quaternion
+            desiredDir = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(rb.rotation);
+            var torque = new Vector3(desiredDir.x * 3.0f, 0, 0) * desiredDir.w * Time.deltaTime;
+            rb.AddTorque(torque, ForceMode.VelocityChange);
+            Debug.DrawRay(transform.position, transform.forward * 100, Color.red);
+
             // decrease lift when aircraft velocity is below a certain value
             rb.AddForce(transform.up * -1 / 50, ForceMode.VelocityChange);
             Debug.Log("WARNING: STALL!!!");
+
         }
         
     }
