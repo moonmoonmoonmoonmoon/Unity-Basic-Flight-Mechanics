@@ -6,68 +6,67 @@ public class Fighter : Aircraft
 {
 
     // Controlling these values would be better on the UI
-    private Rigidbody rb;
-    private float lift = 1.0f;
-    private float manuverMax = 5, manuverVal = 0.1f;
-    public Quaternion desiredDir;
+    public Rigidbody rb;
+    public float manuverMax = 5;
 
     // serialized fields: --> turns out, just needed to make it public...
     // - need to optimize these in the future
     // - manipulating these values on the editor may be confusing
     // - however, manipulating these are easier now than before
+    // NOTE: Set these on the editor to better tune it for an aircraft
     public float 
-        pitchStrength = 3.0f, 
-        yawStrength = 8.0f, 
+        pitchStrength = 1.0f, 
+        yawStrength = 1.0f, 
         rollStrength = 1.0f,
-        weight = 50000,
-        breaking = 10.0f,
-        dragMax = 5.0f,
-        speedLift = 60.0f,
-        cruisingLift = 13.0f,
-        speed = 0.25f,
-        cruisingSpeed = 200.0f;
+        weight = 1.0f,
+        breaking = 1.0f,
+        dragMax = 1.0f,
+        speedLift = 1.0f,
+        cruisingLift = 1.0f,
+        speed = 1.0f,
+        cruisingSpeed = 1.0f;
 
     public override void Manuver() // combined torque controls
     {
         // These are unique to a derived aircraft class
-        Pitch(manuverVal);
-        Yaw(manuverVal);
-        Roll(manuverVal);
+        Pitch();
+        Yaw();
+        Roll();
     }
 
-    private void Pitch(float max) // lateral axis control or Elevator
+    private void Pitch() // lateral axis control or Elevator
     {
         if (Input.GetKey(KeyCode.S) || Input.GetAxisRaw("Mouse Y") > 0)
         {
-            rb.AddTorque(transform.right * -max / pitchStrength, ForceMode.VelocityChange);
+            rb.AddTorque(-pitchStrength * Time.deltaTime * rb.transform.right, ForceMode.VelocityChange);
         }
         if (Input.GetKey(KeyCode.W) || Input.GetAxisRaw("Mouse Y") < 0)
         {
-            rb.AddTorque(transform.right * max / pitchStrength, ForceMode.VelocityChange);
+            rb.AddTorque(pitchStrength * Time.deltaTime * transform.right, ForceMode.VelocityChange);
         }
     }
 
-    private void Yaw(float max) // perpendicular axis control or Rudder
+    private void Yaw() // perpendicular axis control or Rudder
     {
         if (Input.GetKey(KeyCode.A))
         {
-            rb.AddTorque(transform.up * -max / yawStrength, ForceMode.VelocityChange);
+            rb.AddTorque(Time.deltaTime * -yawStrength * transform.up, ForceMode.VelocityChange);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            rb.AddTorque(transform.up * max / yawStrength, ForceMode.VelocityChange);
+            rb.AddTorque(Time.deltaTime * yawStrength * transform.up, ForceMode.VelocityChange);
         }
     }
 
-    private void Roll(float max) // longitudinal axis control or Aileron
+    private void Roll() // longitudinal axis control or Aileron
     {
         if (Input.GetKey(KeyCode.E) || Input.GetAxisRaw("Mouse X") > 0)
         {
-            rb.AddTorque(transform.forward * -max / rollStrength, ForceMode.VelocityChange);
+            rb.AddTorque(-rollStrength * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
         }
         if (Input.GetKey(KeyCode.Q) || Input.GetAxisRaw("Mouse X") < 0)
         {
-            rb.AddTorque(transform.forward * max / rollStrength, ForceMode.VelocityChange);
+            rb.AddTorque(rollStrength * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
         }
     }
 
@@ -78,8 +77,8 @@ public class Fighter : Aircraft
         {
             
             
-            rb.AddForce(transform.forward * 1 / speed, ForceMode.VelocityChange);
-            rb.AddForce(transform.up * lift / speedLift, ForceMode.VelocityChange);
+            rb.AddForce(speed * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
+            rb.AddForce(speedLift * Time.deltaTime * transform.up, ForceMode.VelocityChange);
             if (rb.velocity.magnitude >= 80.0f)
             {
                 // speed limit when using 'afterburner'
@@ -92,30 +91,30 @@ public class Fighter : Aircraft
         if (Input.GetKey(KeyCode.Space))
         {
 
-            rb.AddForce(transform.forward * 1 / breaking, ForceMode.VelocityChange);
+            rb.AddForce(breaking * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
             Stall();
-            rb.AddForce(transform.up * lift / cruisingLift, ForceMode.VelocityChange);
+            rb.AddForce(cruisingLift * Time.deltaTime * transform.up, ForceMode.VelocityChange);
             while (cruisingSpeed > -10 && cruisingSpeed < 10)
             {
                 // decrease forward acceleration when braking
-                cruisingSpeed = cruisingSpeed - 1;
+                cruisingSpeed -= 1;
             }
         }
 
         // cruising speed
         else
         {
-            rb.AddForce(transform.forward * 1 / cruisingSpeed, ForceMode.VelocityChange);
+            rb.AddForce(cruisingSpeed * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
             while (cruisingSpeed < 10)
             {
                 // increase forward acceleration when brakes are released
                 // will optimize the numbers in the future
-                cruisingSpeed = cruisingSpeed + 1 / 1000000;
+                cruisingSpeed += 1 / 1000000;
                 
             }
 
             Stall();
-            rb.AddForce(transform.up * lift / cruisingLift, ForceMode.VelocityChange);
+            rb.AddForce(cruisingLift * Time.deltaTime * transform.up, ForceMode.VelocityChange);
             if (rb.velocity.magnitude >= 80.0f && !Input.GetKey(KeyCode.Space))
             {
                 // speed limit
@@ -134,18 +133,9 @@ public class Fighter : Aircraft
         // affects the pitch angle of the aircraft
         if (rb.velocity.magnitude < 30.0f)
         {
-
-            // change the nose direction to point to the ground when stalling
-            // now utilizing Quaternion
-            desiredDir = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(rb.rotation);
-            var torque = new Vector3(desiredDir.x * 3.0f, 0, 0) * desiredDir.w * Time.deltaTime;
-            rb.AddTorque(torque, ForceMode.VelocityChange);
-            Debug.DrawRay(transform.position, transform.forward * 100, Color.red);
-
             // decrease lift when aircraft velocity is below a certain value
             rb.AddForce(transform.up * -1 / 50, ForceMode.VelocityChange);
             Debug.Log("WARNING: STALL!!!");
-
         }
         
     }
