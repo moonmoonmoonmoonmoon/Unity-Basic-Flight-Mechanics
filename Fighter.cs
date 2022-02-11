@@ -8,6 +8,7 @@ public class Fighter : Aircraft
     // Controlling these values would be better on the UI
     public Rigidbody rb;
     public float manuverMax = 5;
+    public Quaternion stallDir;
 
     // serialized fields: --> turns out, just needed to make it public...
     // - need to optimize these in the future
@@ -31,7 +32,7 @@ public class Fighter : Aircraft
         // These are unique to a derived aircraft class
         Pitch();
         Yaw();
-        Roll();
+        Roll(rollStrength);
     }
 
     private void Pitch() // lateral axis control or Elevator
@@ -58,15 +59,15 @@ public class Fighter : Aircraft
         }
     }
 
-    private void Roll() // longitudinal axis control or Aileron
+    private void Roll(float roll) // longitudinal axis control or Aileron
     {
         if (Input.GetKey(KeyCode.E) || Input.GetAxisRaw("Mouse X") > 0)
         {
-            rb.AddTorque(-rollStrength * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
+            rb.AddTorque(-roll * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
         }
         if (Input.GetKey(KeyCode.Q) || Input.GetAxisRaw("Mouse X") < 0)
         {
-            rb.AddTorque(rollStrength * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
+            rb.AddTorque(roll * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
         }
     }
 
@@ -93,8 +94,12 @@ public class Fighter : Aircraft
 
             rb.AddForce(breaking * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
             Stall();
-            rb.AddForce(cruisingLift * Time.deltaTime * transform.up, ForceMode.VelocityChange);
-            while (cruisingSpeed > -10 && cruisingSpeed < 10)
+            if (rb.velocity.magnitude <= 35)
+            { 
+                rb.AddTorque((Random.Range(-8.0f, 8.0f)) * Time.deltaTime * transform.forward, ForceMode.VelocityChange);
+            }
+            
+            while (cruisingSpeed > -20 && cruisingSpeed < 20)
             {
                 // decrease forward acceleration when braking
                 cruisingSpeed -= 1;
@@ -123,7 +128,7 @@ public class Fighter : Aircraft
             
         }
 
-        
+        Debug.Log(cruisingSpeed);
     }
 
     public void Stall()
@@ -131,11 +136,26 @@ public class Fighter : Aircraft
         // stall motion if speed is less than a value
         // affects the lift of the aircraft at low speed
         // affects the pitch angle of the aircraft
-        if (rb.velocity.magnitude < 30.0f)
+        if (rb.velocity.magnitude < 38.5f)
         {
+            // stallDir is set here when the aircraft stalls
+            // stallDir is the direction that an aircraft points to during a stall
+            // points the nose of the aircraft down
+            stallDir = Quaternion.FromToRotation(-Vector3.down, rb.transform.forward);
+
+            // torque value is set here when the aircraft stalls
+            // the torque value is a Vector3 that takes the XYZ values of the stallDir
+            // multiplied by the stallDir.w and Time.deltaTime
+            // all XYZW values are accounted for to use Quaternion rotations during a stall
+            var torque = new Vector3(stallDir.x, stallDir.y, stallDir.z) * stallDir.w * Time.deltaTime;
+
+            // applied the torque value to the pitch rotation of the aircraft during a stall
+            rb.AddTorque(torque, ForceMode.VelocityChange);
+            Debug.DrawRay(rb.transform.position, transform.forward * 100, Color.red);
+
             // decrease lift when aircraft velocity is below a certain value
             rb.AddForce(transform.up * -1 / 50, ForceMode.VelocityChange);
-            Debug.Log("WARNING: STALL!!!");
+            Debug.Log("WARNING: STALL!!! PULL UP!!!");
         }
         
     }
